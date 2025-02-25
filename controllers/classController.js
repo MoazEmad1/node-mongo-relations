@@ -1,53 +1,45 @@
-const Class = require('../models/Class');
+const classService=require('../services/classService');
 
 const createClass=async(req,res)=>{
-    try{
-        if (req.user.role !== 'teacher')return res.status(403).json({message:'Only teachers can add classes'});
-        const { name }=req.body;
-        const newClass=new Class({ name, teacher: req.user.userId });
-        await newClass.save();
-        res.status(201).json(newClass);
-    }catch(err){
-        res.status(500).json({error:'Error adding class'});
+    try {
+        if (req.user.role!=='teacher')return res.status(403).json({message:'Only teachers can create classes'});
+        const result=await classService.createClass(req.body.name, req.user.userId);
+        res.status(201).json(result);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
     }
 };
-const addStudentToClass=async(req,res)=>{
-    try{
-        if (req.user.role!=='teacher')return res.status(403).json({message:'Only teachers can add students'});
-        const{studentId}=req.body;
-        const classObj =await Class.findById(req.params.classId);
-        if (!classObj)return res.status(404).json({message:'Class not found'});
-        classObj.students.push(studentId);
-        await classObj.save();
-        res.json({message:'Student added successfully'});
-    }catch(err){
-        res.status(500).json({error:'Error adding student'});
+
+const addStudentToClass=async(req, res)=>{
+    try {
+        if (req.user.role!=='teacher')return res.status(403).json({message: 'Only teachers can add students' });
+        const result=await classService.addStudent(req.params.classId, req.body.studentId);
+        res.json(result);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
     }
 };
 
 const getClassDetails=async(req, res)=>{
-    try{
-        const classObj=await Class.findById(req.params.classId).populate('teacher').populate('students');
-        if (!classObj)return res.status(404).json({ message:'Class not found'});
-
-        res.json(classObj);
-    }catch(err){
-        console.log(err);
-        res.status(500).json({error:'Error fetching class'});
-    }
-};
-const deleteClass = async (req,res) => {
     try {
-        if (req.user.role!=='teacher') return res.status(403).json({message:'Only teachers can delete classes'});
-
-        const classObj=await Class.findByIdAndDelete(req.params.classId);
-        if (!classObj)return res.status(404).json({ message:'Class not found'});
-        res.json({message:'Class deleted successfully'});
+        const result=await classService.getClassById(req.params.classId);
+        if (!result)return res.status(404).json({message:'Class not found'});
+        res.json(result);
     } catch (err) {
-        console.error(err);
-        res.status(500).json({error:'Error deleting class'});
+        res.status(500).json({ message: err.message });
     }
 };
 
-module.exports = {createClass,addStudentToClass,getClassDetails,deleteClass};
+const deleteClass=async(req, res)=>{
+    try {
+        if (req.user.role !== 'teacher')
+            return res.status(403).json({message:'Only teachers can delete classes'});
 
+        const result=await classService.deleteClass(req.params.classId);
+        res.json(result);
+    } catch (err) {
+        res.status(500).json({message: err.message});
+    }
+};
+
+module.exports={createClass,addStudentToClass,getClassDetails,deleteClass};

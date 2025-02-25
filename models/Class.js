@@ -1,6 +1,6 @@
 const mongoose=require('mongoose');
 
-const classSchema = new mongoose.Schema({
+const classSchema=new mongoose.Schema({
     name: {type:String,required: true},
     teacher: {type: mongoose.Schema.Types.ObjectId, ref:'User'},
     students: [{type:mongoose.Schema.Types.ObjectId,ref:'User'}]

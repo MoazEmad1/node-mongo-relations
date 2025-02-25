@@ -2,7 +2,7 @@ const classService=require('../services/classService');
 
 const createClass=async(req,res)=>{
     try {
-        if (req.user.role!=='teacher')return res.status(403).json({message:'Only teachers can create classes'});
+        if (req.user.role!=='Teacher')return res.status(403).json({message:'Only teachers can create classes'});
         const result=await classService.createClass(req.body.name, req.user.userId);
         res.status(201).json(result);
     } catch (err) {
@@ -12,7 +12,7 @@ const createClass=async(req,res)=>{
 
 const addStudentToClass=async(req, res)=>{
     try {
-        if (req.user.role!=='teacher')return res.status(403).json({message: 'Only teachers can add students' });
+        if (req.user.role!=='Teacher')return res.status(403).json({message: 'Only teachers can add students' });
         const result=await classService.addStudent(req.params.classId, req.body.studentId);
         res.json(result);
     } catch (err) {
@@ -32,7 +32,7 @@ const getClassDetails=async(req, res)=>{
 
 const deleteClass=async(req, res)=>{
     try {
-        if (req.user.role !== 'teacher')
+        if (req.user.role !== 'Teacher')
             return res.status(403).json({message:'Only teachers can delete classes'});
 
         const result=await classService.deleteClass(req.params.classId);

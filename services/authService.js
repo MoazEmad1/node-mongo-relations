@@ -20,7 +20,7 @@ const registerUser=async({name, email, password, role, subject })=>{
         throw new Error('Invalid Role');
     }
     await user.save();
-    return { message: `${role} registered successfully` };
+    return { message:'User Registered Successfully'};
 };
 
 const loginUser=async({email,password})=>{
